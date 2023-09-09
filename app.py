@@ -1,6 +1,8 @@
 from flask import Flask, render_template
+from api import sql_handlers
 
 app = Flask(__name__)
+connection = sql_handlers.create_connection()
 alphabet = 'abcdefghijklmnopqrstuvwxyz'
 
 # Status code constants
