@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Encrypt Test</title>
+</head>
+<body>
+    <h1>Encrypt Test</h1>
+    {% if text %}
+        <p>You input: {{ text }}, and the cipher-text is: {{ ciphered }}</p>
+    {% else %}
+        <p>Input some text after the /encrypt/ in the URL so I can cipher it.</p>
+    {% endif %}
+</body>
+</html>
