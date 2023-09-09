@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 
 app = Flask(__name__)
-alphabet = 'abcdefghijklmnoprstuwxyz'
+alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+# Status code constants
+OK = 200
+BAD_REQ = 400
 
 
 @app.route('/')
@@ -9,7 +13,12 @@ def hello_world():  # put application's code here
     return render_template('index.html')
 
 
-def encode(word: str, key=2) -> str:
+def encode(word, key) -> str:
+    if word is None or key is None:
+        return ''
+    if key == 0:
+        return word
+
     result = ''
     for character in word:  # for each character
         if character not in alphabet:  # if the character is special
@@ -24,11 +33,13 @@ def encode(word: str, key=2) -> str:
 
 @app.route('/encrypt/')
 @app.route('/encrypt/<text>')
-def cipher_test(text=None):
-    if text is None:
-        return render_template('encrypt.html')
-    return render_template('encrypt.html', text=text, ciphered=encode(text, key=3))
+@app.route('/encrypt/<text>/<key>')
+def cipher_test(text=None, key=None):
+    print(key)
+    if text is None or key is None:
+        return render_template('encrypt.html'), BAD_REQ
+    return render_template('encrypt.html', text=text, ciphered=encode(text, key=int(key))), OK
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
