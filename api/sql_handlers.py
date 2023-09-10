@@ -1,5 +1,7 @@
 import sqlite3
 
+
+# CONSTANTS
 FILE_PATH = 'ciphers.sql'
 CONNECTION = sqlite3.connect(FILE_PATH, check_same_thread=False)
 
@@ -24,9 +26,9 @@ def create_table():
                             ciphered VARCHAR(255),
                             key INTEGER
                         )"""
-    cursor.execute(create_table_query)
+    cursor.execute(create_table_query) # Create table
     close_cursor(cursor)
-    CONNECTION.commit()
+    CONNECTION.commit() # Commit changes
 
 
 def insert_entry(original, ciphered, key):
@@ -34,12 +36,12 @@ def insert_entry(original, ciphered, key):
     insert_query = f"""
             INSERT INTO ciphers(original, ciphered, key) 
             VALUES ('{original}', '{ciphered}', '{key}')
-            """
+            """ # Build up query to execute
     cursor.execute(insert_query)
     id_of_insert = cursor.lastrowid
     close_cursor(cursor)
     CONNECTION.commit()
-    return id_of_insert
+    return id_of_insert # Return id of insertion to display back to user
 
 
 def locate_entry_from_id(entry_id) -> (str, str):

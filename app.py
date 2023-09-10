@@ -12,6 +12,7 @@ sql_handlers.create_table()
 # Status code constants
 OK = 200
 BAD_REQ = 400
+NOT_FOUND = 404
 
 
 @app.route('/')
@@ -43,7 +44,6 @@ def encode(word, key) -> str:
 def cipher_test(text=None, key=None, methods=['GET', 'POST']):
     if not text.isalpha(): # Text is not alphabetical
         return render_template('encrypt.html'), BAD_REQ
-    
     try:
         cipher_text = encode(text, int(key))
         insert_id = sql_handlers.insert_entry(original=text, ciphered=cipher_text, key=key)
@@ -52,6 +52,18 @@ def cipher_test(text=None, key=None, methods=['GET', 'POST']):
         return render_template('encrypt.html'), BAD_REQ
     except TypeError:
         return render_template('encrypt.html'), BAD_REQ
+
+
+@app.route('/retrieve_from_id/<id>')
+def retrieve_from_id(entry_id=None):
+    try:
+        data = sql_handlers.locate_entry_from_id(int(entry_id))
+        if data is None:
+            return render_template('locate_entry.html', found_entry=False), NOT_FOUND
+        return render_template('locate_entry.html', original=data[0], cipher_text=data[1], id=entry_id), OK
+    except TypeError:
+        return render_template('locate_entry.html'), BAD_REQ
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

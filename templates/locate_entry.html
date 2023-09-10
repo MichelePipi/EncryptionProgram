@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locate Entry</title>
+    <link rel="stylesheet" href="../../static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 class="text">Locate Entry From Id</h1>
+
+    {% if found_entry %}
+        <p class="text">Original: {{original}}</p>
+        <p class="text">Cipher Text: {{cipher_text}}</p>
+    {% else %}
+        <p class="text">An entry was not found at the requested Id.</p>
+    {% endif %}
+</body>
+</html>
