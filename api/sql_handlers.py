@@ -46,8 +46,10 @@ def insert_entry(original, ciphered, key):
 
 def locate_entry_from_id(entry_id) -> (str, str):
     cursor = create_cursor()
-    select_query = f'''SELECT * FROM ciphers WHERE ID={entry_id} '''
+    select_query = f'''SELECT * FROM ciphers WHERE id={entry_id} '''
+    print(select_query)
     results = cursor.execute(select_query).fetchone()
+    print(results)
 
     if results is None:
         return (None, None)

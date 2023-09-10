@@ -54,14 +54,23 @@ def cipher_test(text=None, key=None, methods=['GET', 'POST']):
         return render_template('encrypt.html'), BAD_REQ
 
 
-@app.route('/retrieve_from_id/<id>')
+@app.route('/retrieve_from_id/')
+@app.route('/retrieve_from_id/<entry_id>')
 def retrieve_from_id(entry_id=None):
     try:
-        data = sql_handlers.locate_entry_from_id(int(entry_id))
-        if data is None:
+        converted_entry_id = int(entry_id)
+        data = sql_handlers.locate_entry_from_id(converted_entry_id)
+
+        if data == (None, None):
             return render_template('locate_entry.html', found_entry=False), NOT_FOUND
-        return render_template('locate_entry.html', original=data[0], cipher_text=data[1], id=entry_id), OK
+        original = data[1] # Location in data tuple (original, cipher_text)
+        cipher_text = data[2]
+        shift_value = data[3]
+        return render_template('locate_entry.html', original=original, cipher_text=cipher_text, 
+                               id=entry_id, found_entry=True, key=shift_value), OK
     except TypeError:
+        return render_template('locate_entry.html'), BAD_REQ
+    except ValueError:
         return render_template('locate_entry.html'), BAD_REQ
 
 

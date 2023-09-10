@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Locate Entry</title>
-    <link rel="stylesheet" href="../../static/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <h1 class="text">Locate Entry From Id</h1>
+    <link rel="stylesheet" href="../../static/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <h1 class="text">Locate Entry From Id <em>{{id}}</em></h1>
 
     {% if found_entry %}
-        <p class="text">Original: {{original}}</p>
-        <p class="text">Cipher Text: {{cipher_text}}</p>
+    <p class="text">Original: <em>{{original}}</em></p>
+    <p class="text">Cipher Text: <em>{{cipher_text}}</em></p>
+    <p class="text">Shift Value: <em>{{key}}</em></p>
     {% else %}
-        <p class="text">An entry was not found at the requested Id.</p>
+    <p class="text">An entry was not found at the requested Id.</p>
     {% endif %}
-</body>
+  </body>
 </html>
