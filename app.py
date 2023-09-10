@@ -1,15 +1,13 @@
-import re
 from flask import Flask, render_template
 from api import sql_handlers
 
 
 app = Flask(__name__)
-connection = sql_handlers.create_connection()
 ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 ALPHA_REGEX_PATTERN = '[a-z]'
 
 # Create table
-sql_handlers.create_table(connection)
+sql_handlers.create_table()
 
 # Status code constants
 OK = 200
@@ -43,15 +41,17 @@ def encode(word, key) -> str:
 @app.route('/encrypt/<text>')
 @app.route('/encrypt/<text>/<key>')
 def cipher_test(text=None, key=None, methods=['GET', 'POST']):
-    if text is None or key is None:
-        return render_template('encrypt.html'), BAD_REQ
-    if not text.isalpha():
+    if not text.isalpha(): # Text is not alphabetical
         return render_template('encrypt.html'), BAD_REQ
     
-    cipher_text = encode(text, int(key))
-    insert_id = sql_handlers.insert_entry(connection=connection, original=text, ciphered=cipher_text, key=key)
-    return render_template('encrypt.html', text=text, ciphered=cipher_text, insert_id=insert_id), OK
-
+    try:
+        cipher_text = encode(text, int(key))
+        insert_id = sql_handlers.insert_entry(original=text, ciphered=cipher_text, key=key)
+        return render_template('encrypt.html', text=text, ciphered=cipher_text, insert_id=insert_id), OK
+    except ValueError:
+        return render_template('encrypt.html'), BAD_REQ
+    except TypeError:
+        return render_template('encrypt.html'), BAD_REQ
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
