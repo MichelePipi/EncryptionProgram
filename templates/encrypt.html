@@ -7,7 +7,8 @@
 <body>
     <h1>Encrypt Test</h1>
     {% if text %}
-        <p>You input: {{ text }}, and the cipher-text is: {{ ciphered }}</p>
+        <p>You input: <em>{{ text }}</em>, and the cipher-text is: <em>{{ ciphered }}</em></p>
+        <p>The id in the database is: <em>{{ insert_id }}</em></p>
     {% else %}
         <p>Input some text after the /encrypt/ in the URL so I can cipher it.</p>
     {% endif %}

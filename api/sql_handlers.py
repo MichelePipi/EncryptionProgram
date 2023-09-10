@@ -3,7 +3,7 @@ import sqlite3
 FILE_PATH = 'ciphers.sql'
 
 def create_connection() -> sqlite3.Connection:
-    return sqlite3.connect(FILE_PATH, check_same_thread=False)
+    return sqlite3.connect(FILE_PATH, check_same_thread=False).cursor()
 
 
 def delete_table(connection: sqlite3.Connection):
@@ -23,18 +23,14 @@ def create_table(connection: sqlite3.Connection):
     connection.execute(create_table_query)
 
 
-def commit_changes(connection: sqlite3.Connection):
-    connection.commit()
-
-
 def insert_entry(connection: sqlite3.Connection, original,
                  ciphered, key):
     insert_query = f"""
             INSERT INTO ciphers(original, ciphered, key) 
             VALUES ('{original}', '{ciphered}', '{key}')
             """
-    connection.execute(insert_query)
-    commit_changes(connection=connection)
+    print(connection.execute(insert_query).fetchone())
+    return connection.lastrowid
 
 
 def locate_entry_from_id(connection: sqlite3.Connection, entry_id) -> (str, str):

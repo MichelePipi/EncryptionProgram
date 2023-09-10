@@ -1,9 +1,12 @@
+import re
 from flask import Flask, render_template
 from api import sql_handlers
 
+
 app = Flask(__name__)
 connection = sql_handlers.create_connection()
-ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+ALPHA_REGEX_PATTERN = '[a-z]'
 
 # Create table
 sql_handlers.create_table(connection)
@@ -14,7 +17,7 @@ BAD_REQ = 400
 
 
 @app.route('/')
-def hello_world():  # put application's code here
+def hello_world(methods=['GET']):  # put application's code here
     return render_template('index.html')
 
 
@@ -39,13 +42,15 @@ def encode(word, key) -> str:
 @app.route('/encrypt/')
 @app.route('/encrypt/<text>')
 @app.route('/encrypt/<text>/<key>')
-def cipher_test(text=None, key=None):
+def cipher_test(text=None, key=None, methods=['GET', 'POST']):
     if text is None or key is None:
         return render_template('encrypt.html'), BAD_REQ
+    if not text.isalpha():
+        return render_template('encrypt.html'), BAD_REQ
+    
     cipher_text = encode(text, int(key))
-    print(f"Inserting into database plaintext {text} and ciphertext {cipher_text} with key {key}")
-    sql_handlers.insert_entry(connection=connection, original=text, ciphered=cipher_text, key=key)
-    return render_template('encrypt.html', text=text, ciphered=cipher_text), OK
+    insert_id = sql_handlers.insert_entry(connection=connection, original=text, ciphered=cipher_text, key=key)
+    return render_template('encrypt.html', text=text, ciphered=cipher_text, insert_id=insert_id), OK
 
 
 if __name__ == '__main__':
