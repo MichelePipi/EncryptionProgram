@@ -37,8 +37,8 @@ def insert_entry(connection: sqlite3.Connection, original,
     commit_changes(connection=connection)
 
 
-def locate_entry_from_id(connection: sqlite3.Connection, id) -> (str, str):
-    select_query = f'''SELECT * FROM ciphers WHERE ID={id} '''
+def locate_entry_from_id(connection: sqlite3.Connection, entry_id) -> (str, str):
+    select_query = f'''SELECT * FROM ciphers WHERE ID={entry_id} '''
     results = connection.execute(select_query).fetchone()
     if results is None:
         return (None, None)
