@@ -37,10 +37,11 @@ def encode(word, key) -> str:
 @app.route('/encrypt/<text>')
 @app.route('/encrypt/<text>/<key>')
 def cipher_test(text=None, key=None):
-    print(key)
     if text is None or key is None:
         return render_template('encrypt.html'), BAD_REQ
-    return render_template('encrypt.html', text=text, ciphered=encode(text, key=int(key))), OK
+    cipher_text = encode(text, int(key))
+    print(f"Attempting to insert into database plaintext {text} and ciphertext {cipher_text} with key {key}")
+    return render_template('encrypt.html', text=text, ciphered=cipher_text), OK
 
 
 if __name__ == '__main__':
