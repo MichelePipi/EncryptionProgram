@@ -23,8 +23,7 @@ SHIFT_VALUE = 3
 def encode(plaintext, shift_value) -> str:
     ans = ""
     # iterate over the given text
-    for i in enumerate(plaintext):
-        ch = plaintext[i]
+    for i, ch in enumerate(plaintext):
 
         # check if space is there then simply add space
         if ch == " ":
@@ -33,7 +32,6 @@ def encode(plaintext, shift_value) -> str:
         elif ch.isupper():
             ans += chr((ord(ch) + shift_value - 65) % 26 + 65)
         # check if a character is lowercase then encrypt it accordingly
-
         else:
             ans += chr((ord(ch) + shift_value - 97) % 26 + 97)
 
