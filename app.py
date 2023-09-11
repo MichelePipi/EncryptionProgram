@@ -97,3 +97,4 @@ def retrieve_from_id(entry_id=None):
 
 
 if __name__ == "__main__":
+    app.run(debug=True)
