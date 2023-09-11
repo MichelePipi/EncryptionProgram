@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from api import sql_handlers
-import os
 
 
 app = Flask(__name__)
