@@ -20,11 +20,6 @@ CIPHER_TEXT = 2
 SHIFT_VALUE = 3
 
 
-@app.route("/")
-def hello_world(methods=["GET"]):  # put application's code here
-    return render_template("index.html")
-
-
 def encode(plaintext, shift_value) -> str:
     ans = ""
     # iterate over the given text
@@ -45,9 +40,9 @@ def encode(plaintext, shift_value) -> str:
     return ans
 
 
-@app.route("/encrypt/", methods=["GET"])
-def index_encrypt():
-    return render_template("form_encrypt.html"), OK
+@app.route("/")
+def index(methods=["GET"]):  # put application's code here
+    return render_template("form_encrypt.html")
 
 
 @app.route("/encrypt/", methods=["POST"])
