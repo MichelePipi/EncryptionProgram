@@ -1,10 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from api import sql_handlers
 
 
 app = Flask(__name__)
-ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-ALPHA_REGEX_PATTERN = '[a-z]'
+ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+ALPHA_REGEX_PATTERN = "[a-z]"
 
 # Create table
 sql_handlers.create_table()
@@ -14,65 +14,91 @@ OK = 200
 BAD_REQ = 400
 NOT_FOUND = 404
 
+# Indexes for cipher data
+ORIGINAL_TEXT = 1
+CIPHER_TEXT = 2
+SHIFT_VALUE = 3
 
-@app.route('/')
-def hello_world(methods=['GET']):  # put application's code here
-    return render_template('index.html')
+
+@app.route("/")
+def hello_world(methods=["GET"]):  # put application's code here
+    return render_template("index.html")
 
 
-def encode(word, key) -> str:
-    if word is None or key is None:
-        return ''
-    if key == 0:
-        return word
+def encode(plaintext, shift_value) -> str:
+    ans = ""
+    # iterate over the given text
+    for i in enumerate(plaintext):
+        ch = plaintext[i]
 
-    result = ''
-    for character in word:  # for each character
-        if character not in ALPHABET:  # if the character is special
-            result += character  # add the plain character
+        # check if space is there then simply add space
+        if ch == " ":
+            ans += " "
+        # check if a character is uppercase then encrypt it accordingly
+        elif ch.isupper():
+            ans += chr((ord(ch) + shift_value - 65) % 26 + 65)
+        # check if a character is lowercase then encrypt it accordingly
+
         else:
-            number_for_letter = ALPHABET.index(character)  # get the number for the letter
-            cipher_index = number_for_letter - 26 + key
-            cipher_character = ALPHABET[cipher_index]
-            result += cipher_character  # get the encoded letter
-    return result  # give the result back
+            ans += chr((ord(ch) + shift_value - 97) % 26 + 97)
+
+    return ans
 
 
-@app.route('/encrypt/')
-@app.route('/encrypt/<text>')
-@app.route('/encrypt/<text>/<key>')
-def cipher_test(text=None, key=None, methods=['GET', 'POST']):
-    if not text.isalpha(): # Text is not alphabetical
-        return render_template('encrypt.html'), BAD_REQ
-    try:
-        cipher_text = encode(text, int(key))
-        insert_id = sql_handlers.insert_entry(original=text, ciphered=cipher_text, key=key)
-        return render_template('encrypt.html', text=text, ciphered=cipher_text, insert_id=insert_id), OK
-    except ValueError:
-        return render_template('encrypt.html'), BAD_REQ
-    except TypeError:
-        return render_template('encrypt.html'), BAD_REQ
+@app.route("/encrypt/", methods=["GET"])
+def index_encrypt():
+    return render_template("form_encrypt.html"), OK
 
 
-@app.route('/retrieve_from_id/')
-@app.route('/retrieve_from_id/<entry_id>')
+@app.route("/encrypt/", methods=["POST"])
+def encrypt():
+    # Collect data from form submission
+    text_to_encrypt = request.form["text_to_encrypt"]
+    shift_value = int(request.form["shift_value"])
+    encrypted_text = encode(text_to_encrypt, shift_value)
+    insert_id = sql_handlers.insert_entry(
+        original=text_to_encrypt, ciphered=encrypted_text, key=shift_value
+    )
+    return (
+        render_template(
+            "result.html",
+            original=text_to_encrypt,
+            ciphered=encrypted_text,
+            insert_id=insert_id,
+        ),
+        OK,
+    )
+
+
+@app.route("/retrieve_from_id/")
+@app.route("/retrieve_from_id/<entry_id>")
 def retrieve_from_id(entry_id=None):
     try:
         converted_entry_id = int(entry_id)
         data = sql_handlers.locate_entry_from_id(converted_entry_id)
 
         if data == (None, None):
-            return render_template('locate_entry.html', found_entry=False), NOT_FOUND
-        original = data[1] # Location in data tuple (original, cipher_text)
-        cipher_text = data[2]
-        shift_value = data[3]
-        return render_template('locate_entry.html', original=original, cipher_text=cipher_text, 
-                               id=entry_id, found_entry=True, key=shift_value), OK
+            return render_template("locate_entry.html", found_entry=False), NOT_FOUND
+        original = data[ORIGINAL_TEXT]  # Location in data tuple (original, cipher_text)
+        cipher_text = data[CIPHER_TEXT]
+        shift_value = data[SHIFT_VALUE]
+        return (
+            render_template(
+                "locate_entry.html",
+                original=original,
+                cipher_text=cipher_text,
+                id=entry_id,
+                found_entry=True,
+                key=shift_value,
+                query=f"SELECT * FROM ciphers WHERE id='{entry_id}'",
+            ),
+            OK,
+        )
     except TypeError:
-        return render_template('locate_entry.html'), BAD_REQ
+        return render_template("locate_entry.html"), BAD_REQ
     except ValueError:
-        return render_template('locate_entry.html'), BAD_REQ
+        return render_template("locate_entry.html"), BAD_REQ
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True, port=5001)
